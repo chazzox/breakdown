@@ -1,10 +1,11 @@
 <script lang="ts">
     import "./app.css";
-    import { page } from "$app/stores";
     import Navbar from "$lib/navbar.svelte";
 </script>
 
-<div>
+<div class="flex min-h-screen flex-col">
     <Navbar />
-    <slot />
+    <div class="flex-1 flex">
+        <slot />
+    </div>
 </div>

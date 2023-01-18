@@ -31,6 +31,22 @@ export const handle = sequence(
             }),
         ],
         pages: { signIn: "/login" },
+        callbacks: {
+            async jwt({ token, account, user }) {
+                if (account && user) {
+                    token.accessToken = account.access_token;
+                    token.refreshToken = account.refresh_token;
+                }
+                return token;
+            },
+            async session({ session, token }) {
+                // @ts-expect-error
+                session.accessToken = token.accessToken;
+                // @ts-expect-error
+                session.refreshToken = token.refreshToken;
+                return session;
+            },
+        },
     }),
     middleware
 );
