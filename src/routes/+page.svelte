@@ -3,56 +3,8 @@
 
     const session = $page.data.session;
 
-    enum SpotifyTypes {
-        user = "user",
-        playlist = "playlist",
-        track = "track",
-    }
-
-    interface SpotifyImage {
-        height: number | null;
-        url: string;
-        width: number | null;
-    }
-    interface UserInfo {
-        display_name: string;
-        external_urls: { spotify: string };
-        followers: { href: null; total: 15 };
-        href: string;
-        id: string;
-        images: SpotifyImage[];
-        type: SpotifyTypes.user;
-    }
-
-    interface Playlist {
-        collaborative: boolean;
-        description: string;
-        external_urls: { spotify: string };
-        href: string;
-        id: string;
-        images: SpotifyImage[];
-        name: string;
-        owner: UserInfo;
-        primary_color: string | null;
-        public: boolean;
-        snapshot_id: string;
-        tracks: { href: string };
-        type: SpotifyTypes.playlist;
-        uri: string;
-    }
-
-    interface AllPlaylists {
-        href: string;
-        items: Playlist[];
-        limit: number;
-        next: string | null;
-        offset: number;
-        previous: string | null;
-        total: number;
-    }
-
     const statusCodeSuccess = [200, 201];
-    let userList: Playlist[] = [];
+
     async function fetchAllPlaylists(token: string) {
         const playlists: Playlist[] = [];
         let next: string | null = "https://api.spotify.com/v1/me/playlists";
@@ -64,26 +16,18 @@
                 headers: { Authorization: "Bearer " + token },
             });
 
-            const jsonResponse = (await res.json()) as AllPlaylists;
-            if (!statusCodeSuccess.includes(res.status)) {
-                console.error("Playlist fetch Unsuccessful", jsonResponse);
-                next = null;
-                continue;
+            const jsonResponse: any = await res.json();
+            if (res.status !== 200 && res.status !== 201) {
+                throw jsonResponse.error.message;
             }
-            playlists.push(...jsonResponse.items);
+            playlists.push(...(jsonResponse.items as Playlist[]));
             next = jsonResponse.next;
         }
 
         return playlists;
     }
 
-    // @ts-expect-error
-    fetchAllPlaylists(session?.accessToken).then((playlists) => {
-        userList = playlists;
-    });
-    let choice = "";
-
-    const nav = () => {};
+    const playListPromise = fetchAllPlaylists(session?.access_token || "");
 </script>
 
 <div class="flex flex-1 justify-center items-center">
@@ -91,22 +35,26 @@
         <h1 class="text-2xl">Welcome to breakdown</h1>
         <p>Please select the playlist you wish to analyze below</p>
         <div class="flex flex-wrap max-w-5xl gap-4 justify-center">
-            {#each userList as playlist}
-                <a
-                    class="btn btn-accent text-accent-content"
-                    href={`/p/${playlist.id}`}
-                >
-                    <div class="avatar">
-                        <div class="w-10 mr-2 rounded-full">
-                            <img
-                                src={playlist.images[0].url}
-                                alt="user profile"
-                            />
+            {#await playListPromise then userList}
+                {#each userList as playlist}
+                    <a
+                        class="btn btn-accent text-accent-content"
+                        href={`/p/${playlist.id}`}
+                    >
+                        <div class="avatar">
+                            <div class="w-10 mr-2 rounded-full">
+                                <img
+                                    src={playlist.images[0].url}
+                                    alt="user profile"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <p>{playlist.name}</p>
-                </a>
-            {/each}
+                        <p>{playlist.name}</p>
+                    </a>
+                {/each}
+            {:catch error}
+                <p class="text-warning">Something went wrong: {error}</p>
+            {/await}
         </div>
     </div>
 </div>

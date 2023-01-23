@@ -34,16 +34,23 @@ export const handle = sequence(
         callbacks: {
             async jwt({ token, account, user }) {
                 if (account && user) {
-                    token.accessToken = account.access_token;
-                    token.refreshToken = account.refresh_token;
+                    token.access_token = account.access_token;
+                    token.refresh_token = account.refresh_token;
+                    token.expires = account.expires;
                 }
+
+                console.log("jwt-account", account);
+                console.log("jwt-token", token);
+
                 return token;
             },
             async session({ session, token }) {
-                // @ts-expect-error
-                session.accessToken = token.accessToken;
-                // @ts-expect-error
-                session.refreshToken = token.refreshToken;
+                session.access_token = token.access_token;
+                session.refresh_token = token.refresh_token;
+                session.expires = token.expires;
+                console.log("session-session", session);
+                console.log("session-token", token);
+
                 return session;
             },
         },
