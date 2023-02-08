@@ -1,8 +1,6 @@
 {
     "extends": "./.svelte-kit/tsconfig.json",
     "compilerOptions": {
-        "allowJs": true,
-        "checkJs": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
@@ -10,5 +8,5 @@
         "sourceMap": true,
         "strict": true
     },
-    "include": ["./src/authentication.d.ts"]
+    "include": ["src/types/authentication.d.ts"]
 }

@@ -1,3 +1,4 @@
+// @ts-expect-error
 import { SPOTIFY_AUTH_ID, SPOTIFY_AUTH_SECRET } from "$env/static/private";
 import { redirect, type Handle } from "@sveltejs/kit";
 import Spotify from "@auth/core/providers/spotify";
@@ -56,17 +57,26 @@ export const handle = sequence(
                     token.access_token = account.access_token;
                     token.refresh_token = account.refresh_token;
                     token.expires_in =
-                        new Date().getTime() + account?.expires_in * 1000;
+                        new Date().getTime() +
+                        (account?.expires_in || 0) * 1000;
                 }
-                if (token.expires_in < new Date().getTime()) {
+                if (
+                    account?.refresh_token &&
+                    // @ts-expect-error
+                    token.expires_in < new Date().getTime()
+                ) {
                     refetchToken(account.refresh_token);
                 }
                 return token;
             },
             async session({ session, token }) {
+                // @ts-expect-error
                 session.access_token = token.access_token;
+                // @ts-expect-error
                 session.refresh_token = token.refresh_token;
+                // @ts-expect-error
                 session.expires_in = token.expires_in;
+
                 return session;
             },
         },

@@ -1,4 +1,5 @@
 <script lang="ts">
+    // @ts-expect-error
     import { page } from "$app/stores";
     import * as d3 from "d3";
     import { onMount } from "svelte";
@@ -44,7 +45,7 @@
         return res;
     };
 
-    let asdfasdf = [];
+    let asdfasdf: any[] = [];
 
     onMount(async () => {
         var data = [2, 4, 8, 10];
@@ -75,12 +76,15 @@
         var arc = d3.arc().innerRadius(0).outerRadius(radius);
 
         const res = await fetchArtistInfo(fetchAlbumIds(playlist_id));
+
+        // @ts-expect-error
         const flatten_res = res.artists.map((v) => v.genres).flat();
         asdfasdf = flatten_res;
         const test = Object.fromEntries(
             Array.from(new Set(flatten_res)).map((v) => [
                 v,
                 100 *
+                    // @ts-expect-error
                     (flatten_res.find((a) => a == v)?.length /
                         res.artists.length),
             ])
@@ -97,8 +101,10 @@
         //Draw arc paths
         arcs.append("path")
             .attr("fill", function (d, i) {
+                // @ts-expect-error
                 return color(i);
             })
+            // @ts-expect-error
             .attr("d", arc);
     });
 </script>

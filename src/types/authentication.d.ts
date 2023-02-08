@@ -14,7 +14,7 @@ declare module "@auth/core/types" {
 }
 
 declare module "@auth/core/jwt" {
-    interface JWT {
+    export interface JWT {
         access_token?: string;
         refresh_token?: string;
         expires_in?: string;
