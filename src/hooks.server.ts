@@ -21,6 +21,25 @@ const middleware: Handle = async ({ event, resolve }) => {
     return result;
 };
 
+const refetchToken = async (refresh_token: string) => {
+    const req = await fetch("https://accounts.spotify.com/api/token", {
+        method: "POST",
+        headers: {
+            Authorization:
+                "Basic " +
+                new Buffer(
+                    SPOTIFY_AUTH_ID + ":" + SPOTIFY_AUTH_SECRET
+                ).toString("base64"),
+            "content-type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+            grant_type: "refresh_token",
+            refresh_token: refresh_token,
+        }),
+    });
+    console.log(req);
+};
+
 export const handle = sequence(
     SvelteKitAuth({
         providers: [
@@ -36,21 +55,18 @@ export const handle = sequence(
                 if (account && user) {
                     token.access_token = account.access_token;
                     token.refresh_token = account.refresh_token;
-                    token.expires = account.expires;
+                    token.expires_in =
+                        new Date().getTime() + account?.expires_in * 1000;
                 }
-
-                console.log("jwt-account", account);
-                console.log("jwt-token", token);
-
+                if (token.expires_in < new Date().getTime()) {
+                    refetchToken(account.refresh_token);
+                }
                 return token;
             },
             async session({ session, token }) {
                 session.access_token = token.access_token;
                 session.refresh_token = token.refresh_token;
-                session.expires = token.expires;
-                console.log("session-session", session);
-                console.log("session-token", token);
-
+                session.expires_in = token.expires_in;
                 return session;
             },
         },

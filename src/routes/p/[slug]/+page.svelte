@@ -1,5 +1,7 @@
 <script lang="ts">
     import { page } from "$app/stores";
+    import * as d3 from "d3";
+    import { onMount } from "svelte";
 
     const playlist_id = $page.params.slug;
 
@@ -9,7 +11,7 @@
             {
                 headers: {
                     // @ts-ignore
-                    Authorization: `Bearer ${$page.data.session.accessToken}`,
+                    Authorization: `Bearer ${$page.data.session.access_token}`,
                 },
             }
         );
@@ -34,27 +36,108 @@
         const req = await fetch(url, {
             headers: {
                 // @ts-ignore
-                Authorization: `Bearer ${$page.data.session.accessToken}`,
+                Authorization: `Bearer ${$page.data.session.access_token}`,
             },
         });
 
         const res = await req.json();
-        console.log(res);
         return res;
     };
 
-    const res = fetchArtistInfo(fetchAlbumIds(playlist_id));
+    let asdfasdf = [];
+
+    onMount(async () => {
+        var data = [2, 4, 8, 10];
+
+        var svg = d3.select("svg"),
+            width = parseInt(svg.attr("width")),
+            height = parseInt(svg.attr("height")),
+            radius = Math.min(width, height) / 2.5,
+            g = svg
+                .append("g")
+                .attr(
+                    "transform",
+                    "translate(" + width / 2 + "," + height / 2 + ")"
+                );
+
+        var color = d3.scaleOrdinal([
+            "#4daf4a",
+            "#377eb8",
+            "#ff7f00",
+            "#984ea3",
+            "#e41a1c",
+        ]);
+
+        // Generate the pie
+        var pie = d3.pie();
+
+        // Generate the arcs
+        var arc = d3.arc().innerRadius(0).outerRadius(radius);
+
+        const res = await fetchArtistInfo(fetchAlbumIds(playlist_id));
+        const flatten_res = res.artists.map((v) => v.genres).flat();
+        asdfasdf = flatten_res;
+        const test = Object.fromEntries(
+            Array.from(new Set(flatten_res)).map((v) => [
+                v,
+                100 *
+                    (flatten_res.find((a) => a == v)?.length /
+                        res.artists.length),
+            ])
+        );
+
+        //Generate groups
+        var arcs = g
+            .selectAll("arc")
+            .data(pie(Object.values(test)))
+            .enter()
+            .append("g")
+            .attr("class", "arc");
+
+        //Draw arc paths
+        arcs.append("path")
+            .attr("fill", function (d, i) {
+                return color(i);
+            })
+            .attr("d", arc);
+    });
 </script>
 
-<p>{playlist_id} spotify is the dumbest pos ive ever come across</p>
+<div>
+    <p>{playlist_id} spotify is the dumbest pos ive ever come across</p>
+    <p>{asdfasdf}</p>
+    <p>
+        {(asdfasdf?.find((v) => v.includes("jazz"))?.length / asdfasdf.length) *
+            100}
+    </p>
+    <svg width="500" height="400" />
+</div>
 
-{#await res}
-    <h1>fetching stuff</h1>
-{:then result}
-    {result.artists.map(
-        // @ts-ignore
-        (v) => v.genres
-    )}
-{:catch}
-    <h1>something went wrong whoop</h1>
-{/await}
+<style>
+    :global(.arc text) {
+        font: 10px sans-serif;
+        text-anchor: middle;
+    }
+
+    :global(.arc path) {
+        stroke: #fff;
+    }
+
+    :global(.arc :hover) {
+        transform: scale(1.15);
+        transition: transform 0.5s;
+    }
+
+    :global(.title) {
+        fill: teal;
+        font-weight: bold;
+    }
+    :global(.chart :global(div)) {
+        font: 10px sans-serif;
+        background-color: steelblue;
+        text-align: right;
+        padding: 3px;
+        margin: 1px;
+        color: white;
+    }
+</style>
