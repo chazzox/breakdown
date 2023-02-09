@@ -38,7 +38,7 @@ const refetchToken = async (refresh_token: string) => {
             refresh_token: refresh_token,
         }),
     });
-    console.log(req);
+    console.log(await req.json());
 };
 
 export const handle = sequence(
@@ -60,12 +60,11 @@ export const handle = sequence(
                         new Date().getTime() +
                         (account?.expires_in || 0) * 1000;
                 }
-                if (
-                    account?.refresh_token &&
-                    // @ts-expect-error
-                    token.expires_in < new Date().getTime()
-                ) {
-                    refetchToken(account.refresh_token);
+                // @ts-expect-error
+                if (token.expires_in < new Date().getTime()) {
+                    console.log("test", token?.refresh_token);
+
+                    refetchToken((token?.refresh_token as string) || "");
                 }
                 return token;
             },

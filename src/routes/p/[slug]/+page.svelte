@@ -107,15 +107,20 @@
             // @ts-expect-error
             .attr("d", arc);
     });
+
+    const filters = ["jazz", "soul", "indie", "rock", "psychedelic", "psych"];
 </script>
 
 <div>
     <p>{playlist_id} spotify is the dumbest pos ive ever come across</p>
     <p>{asdfasdf}</p>
-    <p>
-        {(asdfasdf?.find((v) => v.includes("jazz"))?.length / asdfasdf.length) *
-            100}
-    </p>
+    {#each filters as as}
+        <p>
+            {as} count: {(asdfasdf?.find((v) => v.includes(as))?.length /
+                asdfasdf.length) *
+                100}
+        </p>
+    {/each}
     <svg width="500" height="400" />
 </div>
 

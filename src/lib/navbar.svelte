@@ -3,7 +3,7 @@
     import { signOut } from "@auth/sveltekit/client";
 </script>
 
-<nav class="navbar bg-base-300 shadow-xl">
+<nav class="navbar bg-accent shadow-xl text-accent-content">
     <div class="flex-1">
         <a
             data-sveltekit-reload
