@@ -28,7 +28,7 @@ interface Song {
     video_thumbnail: { url: string | null };
 }
 
-interface Tracklist {
+interface TrackList {
     href: string;
     items: Song[];
     limit: number;
@@ -85,11 +85,4 @@ interface AllPlaylists {
     offset: number;
     previous: string | null;
     total: number;
-}
-
-interface SpotifyError {
-    error: {
-        status: number;
-        message: string;
-    };
 }

@@ -1,36 +1,29 @@
-<script>
-    import Notes1 from "$lib/notes/notes.svelte";
-    import Notes2 from "$lib/notes/notes2.svelte";
-    import Notes3 from "$lib/notes/notes3.svelte";
-    import Notes4 from "$lib/notes/notes4.svelte";
+<script> 
+    import Notes from "$lib/notes/index.svelte";
     import { signIn } from "@auth/sveltekit/client";
 </script>
 
-<div class="hero flex-1 bg-base-300">
+<div class="hero flex-1 px-3">
     <div class="hero-overlay">
-        <Notes1
-            class="h-52 fill-white/10 fixed left-[70vw] top-[45vh] rotate-[35deg]"
-        />
-        <Notes3
-            class="h-52 fill-white/10 fixed -left-[4vh] top-[10vh] -rotate-[25deg]"
-        />
-        <Notes4
-            class="h-52 fill-white/10 fixed left-[17vw] top-[62vh] rotate-[15deg]"
-        />
+        <Notes/>
     </div>
     <div
-        class="hero-content text-center text-primary-content bg-primary rounded-2xl shadow-2xl mb-36"
+        class="hero-content text-center text-base-content bg-base-100 rounded-2xl shadow-2xl mb-36 max-w-2xl w-full"
     >
-        <div class="max-w-2xl">
+        <div class="flex-1">
             <h1 class="mb-5 text-5xl font-bold">Hello!</h1>
             <p class="mb-5">
-                I've decided to roll my multiple spotify api projects into one.
-                So here it is! In this project you can backup your discover
-                weekly playlists and also breakdown your playlist genres.
-                Enjoy...!
+                Decided to roll a bunch of spotify api stuff i made into one app
             </p>
+            <ul class="list-disc list-inside font-bold">
+                <li>RePlay - A service to backup your discover weekly</li>
+                <li>
+                    Breakdown - A service that lets you see the different genre
+                    breakdown of a playlist
+                </li>
+            </ul>
             <button
-                class="btn btn-secondary mt-3"
+                class="btn btn-secondary mt-3 px-20"
                 on:click={() => signIn("spotify", { callbackUrl: "/" })}
             >
                 Get Started

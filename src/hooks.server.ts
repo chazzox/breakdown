@@ -38,7 +38,7 @@ const refetchToken = async (refresh_token: string) => {
             refresh_token: refresh_token,
         }),
     });
-    console.log(await req.json());
+    return await req.json();
 };
 
 export const handle = sequence(
@@ -64,7 +64,14 @@ export const handle = sequence(
                 if (token.expires_in < new Date().getTime()) {
                     console.log("test", token?.refresh_token);
 
-                    refetchToken((token?.refresh_token as string) || "");
+                    const newData = await refetchToken(
+                        (token?.refresh_token as string) || ""
+                    );
+                    token.access_token = newData.access_token;
+                    token.refresh_token = newData.refresh_token;
+                    token.access_token =
+                        new Date().getTime() +
+                        (newData?.expires_in || 0) * 1000;
                 }
                 return token;
             },
